@@ -15,11 +15,19 @@ using OSGeo.MapGuide;
 using Autodesk.AutoCAD.Windows;
 using Autodesk.DesignScript.Runtime;
 using System.Security.Cryptography.X509Certificates;
+using System.Net.NetworkInformation;
 
 namespace MapConnection
 {
-	class CoordinateSystems
+	public class CoordinateSystems
 	{
+		public static string GetCoordinateSystem()
+		{
+			CivilDocument c3d_doc = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument;
+			var Units_Window = c3d_doc.Settings.DrawingSettings;
 
+			string Current_CS = Units_Window.UnitZoneSettings.CoordinateSystemCode;
+			return Current_CS;
+		}
 	}
 }

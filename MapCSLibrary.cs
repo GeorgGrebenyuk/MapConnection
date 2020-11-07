@@ -62,6 +62,7 @@ namespace MapConnection
 		{
 			var guid = Guid.NewGuid();
 			string writePath = $@"{Folder_Path}\{guid}.lsp";
+			string writePath2 = $@"{Folder_Path}\{guid}.scr";
 
 			MgCoordinateSystemFactory coordSysFactory = new MgCoordinateSystemFactory();
 			MgCoordinateSystemCatalog csCatalog = coordSysFactory.GetCatalog();
@@ -88,7 +89,6 @@ namespace MapConnection
 				cs = csDict.GetCoordinateSystem(csName);
 				csProtect = cs.IsProtected();
 
-
 					if (csProtect == selection)
 					{
 						using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
@@ -105,6 +105,15 @@ namespace MapConnection
 				export_file.Close();
 				export_file.Dispose();
 			}
+
+			using (StreamWriter export_file2 = new StreamWriter(writePath2, true, Encoding.UTF8))
+			{
+				export_file2.WriteLine("(load "+ $@"""C:\\Users\\GeorgKeneberg\\Documents\\Temp\\LOG\\{guid}.lsp"")");
+				export_file2.WriteLine("_QUIT");
+				export_file2.Close();
+				export_file2.Dispose();
+			}
+			System.Diagnostics.Process.Start($@"""C:/Program Files/Autodesk/AutoCAD 2021/accoreconsole.exe"" /s ""{writePath2}""");
 		}
 		/// <summary>
 		/// Node GetListOfMAPCSLIBRAR for export to LSP file naming of coordinate systems (all library)
@@ -151,6 +160,10 @@ namespace MapConnection
 			}
 
 		}
-		
+		public static void GetXML ()
+		{
+			System.Diagnostics.Process.Start(@"""C:/Program Files/Autodesk/AutoCAD 2021/accoreconsole.exe"" /s ""C:/Users/GeorgKeneberg/Documents/Temp/LOGda21b338-88ea-404c-973b-817bd52a7de8.scr""");
+		}
 	}
 }
+
