@@ -1,0 +1,11 @@
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\bin\Debug\GetListOfCS.dll.config
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\bin\Debug\GetListOfCS.dll
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\bin\Debug\GetListOfCS.pdb
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\bin\Debug\DynamoServices.dll
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\bin\Debug\DynamoUnits.dll
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\bin\Debug\ProtoGeometry.dll
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\obj\Debug\GetListOfCS.csproj.CoreCompileInputs.cache
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\obj\Debug\GetListOfCS.csproj.CopyComplete
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\obj\Debug\GetListOfCS.dll
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\obj\Debug\GetListOfCS.pdb
+C:\Work\Code\IDE\My_projects\TestOnly\GetListOfCS\obj\Debug\GetListOfCS.csprojAssemblyReference.cache
