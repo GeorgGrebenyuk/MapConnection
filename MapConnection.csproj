@@ -57,6 +57,10 @@
       <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2021\C3D\AeccDbMgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Autodesk.Map.Platform">
+      <HintPath>..\..\..\Program Files\Autodesk\AutoCAD 2021\Map\Autodesk.Map.Platform.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="DynamoServices, Version=2.6.0.8481, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\DynamoVisualProgramming.DynamoServices.2.6.0.8481\lib\net47\DynamoServices.dll</HintPath>
     </Reference>
