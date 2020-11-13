@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MapConnection</name>
+    </assembly>
+    <members>
+        <member name="M:MapConnection.CoordinateSystems.GetCurrentCoordinateSystem">
+            <summary>
+            Node GetCurrentCoordinateSystem return the name of current CS (assigned to drawing)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MapConnection.CoordinateSystems.GetFullWKTCodeOfCS(System.String,System.String)">
+            <summary>
+            Node GetFullWKTCodeOfCS return full WKT code of input CS's name (include geodetic datum)
+            </summary>
+            <param name="Current_CS">Name of current/needing CS</param>
+            <param name="XML_MapCSLibrary_path">Absolute Path to XML-Definition of MapCSLibrary</param>
+            <returns>Full-WKT code of CS and "Console" - text string with exeptions (if code doesn't finished)</returns>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.CS_Language_RUS">
+            <summary>
+            CS_Language_RUS return system values for creation LSP file, if program language is Russian
+            </summary>
+            <returns>CS_value, CS_Agree - give them to GetPartOfMAPCSLIBRARY or GetAllOfMAPCSLIBRARY</returns>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.CS_Language_ENG">
+            <summary>
+            CS_Language_ENG return system values for creation LSP file, if program language is English
+            </summary>
+            <returns>CS_value, CS_Agree - give them to GetPartOfMAPCSLIBRARY or GetAllOfMAPCSLIBRARY</returns>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.GetPartOfMAPCSLIBRARY(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Node GetListOfMAPCSLIBRAR for export to LSP file naming of coordinate systems (user or system)
+            </summary>
+            <param name="CS_value">Name of type "CoordinateSystem"</param>
+            <param name="selection">If false - exporting only User's definitions; if true - exporting only system definitions</param>
+            <param name="CS_Agree">Permit to add other associated definitions</param>
+            <param name="Folder_Path">Directory path to save LSP file</param>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.GetAllOfMAPCSLIBRARY(System.String,System.String,System.String)">
+            <summary>
+            Node GetListOfMAPCSLIBRAR for export to LSP file naming of coordinate systems (all library)
+            </summary>
+            <param name="CS_value">Name of type "CoordinateSystem"</param>
+            <param name="CS_Agree">Permit to add other associated definitions</param>
+            <param name="Folder_Path">Directory path to save LSP file</param>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.GetListAndCountOfCategories">
+            <summary>
+            Node GetListAndCountOfCategories returns a list of all Categories in MapCSLibrary and count of them
+            </summary>
+            <returns>Count of Categories and result List</returns>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.RenameCurrentCategory(System.String,System.String)">
+            <summary>
+            Node RenameCurrentCategory rename Category form MapCSLibrary
+            </summary>
+            <param name="new_cat_name"></param>
+            <param name="old_cat_name"></param>
+        </member>
+        <member name="M:MapConnection.MapCSLibrary.GetFullWKTCodeOfAllCS(System.String,System.Boolean,System.String,System.Boolean)">
+            <summary>
+            Node GetFullWKTCodeOfAllCS create a List and external txt file with FullWKT codes of coordinate systems in MapCSLibrary
+            </summary>
+            <param name="XML_MapCSLibrary_path_Full">Path to XML-defonotion of MapCSLibrary</param>
+            <param name="selection">Bool parameter </param>
+            <param name="WriteFolder"></param>
+            <param name="all_data"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
