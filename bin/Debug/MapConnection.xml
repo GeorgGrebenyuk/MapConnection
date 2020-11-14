@@ -10,13 +10,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:MapConnection.CoordinateSystems.GetFullWKTCodeOfCS(System.String,System.String)">
+        <member name="M:MapConnection.CoordinateSystems.GetWKT2Code_ofCSList(System.String,System.String,System.String,System.Boolean)">
             <summary>
-            Node GetFullWKTCodeOfCS return full WKT code of input CS's name (include geodetic datum)
+            Node GetWKT2Code_ofCSLis return an external file with all codes for input CS's file
             </summary>
-            <param name="Current_CS">Name of current/needing CS</param>
-            <param name="XML_MapCSLibrary_path">Absolute Path to XML-Definition of MapCSLibrary</param>
-            <returns>Full-WKT code of CS and "Console" - text string with exeptions (if code doesn't finished)</returns>
+            <param name="XML_MapCSLibrary_path">Path to CS_Library.xml</param>
+            <param name="Folder_Path">Absolute path to folder where need to create WKT's codes library</param>
+            <param name="TXT_CS_List_path">Path to file witl Lisf of CS's names</param>
+            <param name="str_format">If = true, WKT-code if split to strings; if false - it = one string</param>
+            <returns>String with Full-WKT2 code or result</returns>
         </member>
         <member name="M:MapConnection.MapCSLibrary.CS_Language_RUS">
             <summary>
@@ -60,15 +62,12 @@
             <param name="new_cat_name"></param>
             <param name="old_cat_name"></param>
         </member>
-        <member name="M:MapConnection.MapCSLibrary.GetFullWKTCodeOfAllCS(System.String,System.Boolean,System.String,System.Boolean)">
+        <member name="M:MapConnection.MapCSLibrary.GetCSList(System.String,System.Boolean)">
             <summary>
-            Node GetFullWKTCodeOfAllCS create a List and external txt file with FullWKT codes of coordinate systems in MapCSLibrary
+            Node GetCSList returns an external txt file that Contains strings with CS's names
             </summary>
-            <param name="XML_MapCSLibrary_path_Full">Path to XML-defonotion of MapCSLibrary</param>
-            <param name="selection">Bool parameter </param>
-            <param name="WriteFolder"></param>
-            <param name="all_data"></param>
-            <returns></returns>
+            <param name="Folder_Path">Directory path to save TXT file</param>
+            <param name="selection">If = true, export all CS in Library, if false - only Users collection</param>
         </member>
     </members>
 </doc>
