@@ -60,10 +60,11 @@ namespace MapConnection
 		/// <param name="selection">If false - exporting only User's definitions; if true - exporting only system definitions</param>
 		/// <param name="CS_Agree">Permit to add other associated definitions</param>
 		/// <param name="Folder_Path">Directory path to save LSP file</param>
-		async public static void GetPartOfMAPCSLIBRARY(string Folder_Path, string CS_value, string CS_Agree, bool selection)
+		 public static void GetPartOfMAPCSLIBRARY(string Folder_Path, string CS_value, string CS_Agree, bool selection)
 		{
 			var guid = Guid.NewGuid();
 			string writePath = $@"{Folder_Path}\{guid}.lsp";
+			StringBuilder sb = new StringBuilder();
 
 			MgCoordinateSystemFactory coordSysFactory = new MgCoordinateSystemFactory();
 			MgCoordinateSystemCatalog csCatalog = coordSysFactory.GetCatalog();
@@ -71,12 +72,7 @@ namespace MapConnection
 
 			MgCoordinateSystemEnum csDictEnum = csDict.GetEnum();
 			int csCount = csDict.GetSize();
-			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
-			{
-				export_file.WriteLine(@"(command ""MAPCSLIBRARYEXPORT""");
-				export_file.Close();
-				export_file.Dispose();
-			}
+			sb.AppendLine(@"(command ""MAPCSLIBRARYEXPORT""");
 
 			MgStringCollection csNames = csDictEnum.NextName(csCount);
 			string csName = null;
@@ -92,19 +88,15 @@ namespace MapConnection
 
 					if (csProtect == selection)
 					{
-						using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
-						{
-							string csNameStr = csName.ToString();
-							await export_file.WriteLineAsync($@"""{csNameStr}""" + " " + $"\"{CS_value}\"");
-						}
+					sb.AppendLine($@"""{csName}""" + " " + $"\"{CS_value}\"");
+
 					}
 			}
 			string space = " ";
-			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
+			sb.AppendLine(" " + $@"""{space}""" + " " + $@"""{CS_Agree}""" + " " + @"""""" + ")");
+			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.ASCII))
 			{
-				export_file.Write(" " + $@"""{space}""" + " " + $@"""{CS_Agree}""" +" " +  @"""""" + ")");
-				export_file.Close();
-				export_file.Dispose();
+				export_file.Write(sb.ToString());
 			}
 
 		}
@@ -114,8 +106,9 @@ namespace MapConnection
 		/// <param name="CS_value">Name of type "CoordinateSystem"</param>
 		/// <param name="CS_Agree">Permit to add other associated definitions</param>
 		/// <param name="Folder_Path">Directory path to save LSP file</param>
-		async public static void GetAllOfMAPCSLIBRARY(string Folder_Path, string CS_value, string CS_Agree)
+		public static void GetAllOfMAPCSLIBRARY(string Folder_Path, string CS_value, string CS_Agree)
 		{
+			StringBuilder sb = new StringBuilder();
 			var guid = Guid.NewGuid();
 			string writePath = $@"{Folder_Path}\{guid}.lsp";
 
@@ -125,31 +118,22 @@ namespace MapConnection
 
 			MgCoordinateSystemEnum csDictEnum = csDict.GetEnum();
 			int csCount = csDict.GetSize();
-			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
-			{
-				export_file.WriteLine(@"(command ""MAPCSLIBRARYEXPORT""");
-				export_file.Close();
-				export_file.Dispose();
-			}
+			sb.AppendLine(@"(command ""MAPCSLIBRARYEXPORT""");
 
 			MgStringCollection csNames = csDictEnum.NextName(csCount);
 			string csName = null;
-
+			
 			for (int i = 0; i < csCount; i++)
 			{
 				csName = csNames.GetItem(i);
-				using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
-				{
-					string csNameStr = csName.ToString();
-					await export_file.WriteLineAsync($@"""{csNameStr}""" + " " + $"\"{CS_value}\"");
-				}
+				sb.AppendLine($@"""{csName.ToString()}""" + " " + $"\"{CS_value}\"");
+				
 			}
 			string space = " ";
-			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
+			sb.AppendLine(" " + $@"""{space}""" + " " + $@"""{CS_Agree}""" + " " + @"""""" + ")");
+			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.ASCII))
 			{
-				export_file.Write(" " + $@"""{space}""" + " " + $@"""{CS_Agree}""" + " " + @"""""" + ")");
-				export_file.Close();
-				export_file.Dispose();
+				export_file.Write(sb.ToString());
 			}
 
 		}
@@ -201,8 +185,9 @@ namespace MapConnection
 		/// </summary>
 		/// <param name="Folder_Path">Directory path to save TXT file</param>
 		/// <param name="selection">If = true, export all CS in Library, if false - only Users collection</param>
-		async public static void GetCSList (string Folder_Path, bool selection)
+		public static void GetCSList (string Folder_Path, bool selection)
 		{
+			StringBuilder sb = new StringBuilder();
 			var guid = Guid.NewGuid();
 			string writePath = $@"{Folder_Path}\{guid}CS_List.txt";
 
@@ -228,15 +213,18 @@ namespace MapConnection
 
 				if (csProtect == selection)
 				{
-					using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
-					{
-						string csNameStr = csName.ToString();
-						await export_file.WriteLineAsync(csNameStr);
-					}
+					sb.AppendLine(csName.ToString());
+
 				}
+			}
+			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
+			{
+				export_file.Write(sb.ToString());
 			}
 
 		}
+
+		
 	}
 		
 }

@@ -922,18 +922,16 @@
             <param name="m44"></param>
         </member>
         <member name="M:Autodesk.DesignScript.Interfaces.ITransformable.SetTransform(System.Double[])">
-            <summary>
-            Set the transform as a double array, this transform is applied to all geometry in the renderPackage.
-            This matrix should be laid out as follows in row vector order:
-            [Xx,Xy,Xz, 0,
-             Yx, Yy, Yz, 0,
-             Zx, Zy, Zz, 0,
-             offsetX, offsetY, offsetZ, W]
+             <summary>
+             Set the transform as a double array, this transform is applied to all geometry in the renderPackage.
+             This matrix should be laid out as follows in row vector order:
+             [Xx,Xy,Xz, 0,
+              Yx, Yy, Yz, 0,
+              Zx, Zy, Zz, 0,
+              offsetX, offsetY, offsetZ, W]
             NOTE: This method should transform the matrix from row vector order to whatever form is needed by the implementation.
-            When converting from ProtoGeometry CoordinateSystem form to input matrix, set the first row to the X axis of the CS,
-            the second row to the Y axis of the CS, the third row to the Z axis of the CS, and the last row to the CS origin, where W = 1. 
-            </summary>
-            <param name="matrix"></param>
+             </summary>
+             <param name="matrix"></param>
         </member>
         <member name="P:Autodesk.DesignScript.Interfaces.TessellationParameters.Tolerance">
             <summary>
@@ -1240,24 +1238,6 @@
         <member name="T:DynamoServices.TraceUtils">
             <summary>
             Utility class to Get/Set TraceData
-            </summary>
-        </member>
-        <member name="M:DynamoServices.TraceUtils.TEMP_GetTraceKeys">
-            <summary>
-            Returns a list of the keys bound to trace elements
-            This should be extracted from the attribute on the methods
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DynamoServices.TraceUtils.ClearTLSKey(System.String)">
-            <summary>
-            Clear a specific key
-            </summary>
-            <param name="key"></param>
-        </member>
-        <member name="M:DynamoServices.TraceUtils.ClearAllKnownTLSKeys">
-            <summary>
-            Clear the named slots for all the know keys
             </summary>
         </member>
         <member name="M:DynamoServices.TraceUtils.GetTraceData(System.String)">

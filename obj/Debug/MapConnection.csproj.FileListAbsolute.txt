@@ -22,4 +22,7 @@ C:\Work\Code\MapConnection\bin\Debug\MapConnection.pdb
 C:\Work\Code\MapConnection\obj\Debug\MapConnection.csproj.CoreCompileInputs.cache
 C:\Work\Code\MapConnection\obj\Debug\MapConnection.dll
 C:\Work\Code\MapConnection\obj\Debug\MapConnection.pdb
-C:\Work\Code\MapConnection\obj\Debug\MapConnection.csprojAssemblyReference.cache
+C:\Work\Code\MapConnection\bin\Debug\DynamoServices.dll
+C:\Work\Code\MapConnection\bin\Debug\DynamoUnits.dll
+C:\Work\Code\MapConnection\bin\Debug\ProtoGeometry.dll
+C:\Work\Code\MapConnection\obj\Debug\MapConnection.csproj.CopyComplete

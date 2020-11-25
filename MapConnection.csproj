@@ -8,13 +8,14 @@
     <OutputType>Library</OutputType>
     <RootNamespace>MapConnection</RootNamespace>
     <AssemblyName>MapConnection</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -62,13 +63,11 @@
       <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\Map\Autodesk.Map.Platform.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DynamoServices, Version=2.6.0.8481, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\DynamoVisualProgramming.DynamoServices.2.6.0.8481\lib\net47\DynamoServices.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="DynamoServices, Version=2.2.0.4565, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DynamoVisualProgramming.DynamoServices.2.2.0.4565\lib\net47\DynamoServices.dll</HintPath>
     </Reference>
-    <Reference Include="DynamoUnits, Version=2.6.0.8481, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\DynamoVisualProgramming.ZeroTouchLibrary.2.6.0.8481\lib\net47\DynamoUnits.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="DynamoUnits, Version=2.2.0.4565, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DynamoVisualProgramming.ZeroTouchLibrary.2.2.0.4565\lib\net47\DynamoUnits.dll</HintPath>
     </Reference>
     <Reference Include="OSGeo.MapGuide.Foundation">
       <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\Map\bin\GisPlatform\OSGeo.MapGuide.Foundation.dll</HintPath>
@@ -82,9 +81,8 @@
       <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\Map\bin\GisPlatform\OSGeo.MapGuide.PlatformBase.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ProtoGeometry, Version=2.6.0.8195, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\DynamoVisualProgramming.ZeroTouchLibrary.2.6.0.8481\lib\net47\ProtoGeometry.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="ProtoGeometry, Version=2.1.0.15993, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\DynamoVisualProgramming.ZeroTouchLibrary.2.2.0.4565\lib\net47\ProtoGeometry.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
