@@ -10,6 +10,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:MapConnection.CoordinateSystems.GetWKTFromDrawing">
+            <summary>
+            Node return WKT code of assigned CS of drawing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:MapConnection.CoordinateSystems.AssignCSFromWKT(System.String)">
+            <summary>
+            Assign CS to drawing from WKT code (as string)
+            </summary>
+            <param name="wkt"></param>
+        </member>
         <member name="M:MapConnection.CoordinateSystems.GetWKT2Code_ofCSList(System.String,System.String,System.String,System.Boolean)">
             <summary>
             Node GetWKT2Code_ofCSLis return an external file with all codes for input CS's file

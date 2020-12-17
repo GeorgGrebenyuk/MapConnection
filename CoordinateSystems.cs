@@ -37,6 +37,38 @@ namespace MapConnection
 
 			return csCode;
 		}
+    /// <summary>
+    /// Node return WKT code of assigned CS of drawing
+    /// </summary>
+    /// <returns></returns>
+    public static string GetWKTFromDrawing ()
+		{
+      Autodesk.Gis.Map.Platform.AcMapMap map = Autodesk.Gis.Map.Platform.AcMapMap.GetCurrentMap();
+      string wkt = map.GetMapSRS();
+      return wkt;
+    }
+    /// <summary>
+    /// Assign CS to drawing from WKT code (as string)
+    /// </summary>
+    /// <param name="wkt"></param>
+    public static void AssignCSFromWKT (string wkt)
+		{
+      CivilDocument c3d_doc = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument;
+      var Units_Window = c3d_doc.Settings.DrawingSettings;
+
+      Document m_Doc = Application.DocumentManager.MdiActiveDocument;
+      Database db = m_Doc.Database;
+
+      OSGeo.MapGuide.MgCoordinateSystemFactory factory = new OSGeo.MapGuide.MgCoordinateSystemFactory();
+      string csCode = factory.ConvertWktToCoordinateSystemCode(wkt);
+
+      using (Transaction tr = db.TransactionManager.StartTransaction())
+      {
+        Units_Window.UnitZoneSettings.CoordinateSystemCode = csCode;
+        tr.Commit();
+      }
+    }
+
 
         /// <summary>
         /// Node GetWKT2Code_ofCSLis return an external file with all codes for input CS's file
