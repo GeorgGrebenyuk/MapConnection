@@ -97,12 +97,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoordinateSystems.cs" />
+    <Compile Include="CoordTransform.cs" />
     <Compile Include="MapCSLibrary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\WKT-RusMSK.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
