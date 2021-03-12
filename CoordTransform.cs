@@ -35,14 +35,11 @@ namespace MapConnection
             /// <param name="Longitude">Долгота в радианах (если подаете в градусах, она пересчитается автоматически)</param>
             /// <returns></returns>
             [MultiReturn(new[] { "Coord X", "Coord Y" })]
-            public static Dictionary<string, object> TM_FromGeodeticToRectangle (
+            public static Dictionary<string, double> TM_FromGeodeticToRectangle (
                 Dictionary <string,double> Ellipsoid, 
                 Dictionary<string, double> CS_Params, 
                 double Latitude, double Longitude)
-			{   
-                //Проверка, в радианах ли координаты
-                if (Latitude * 180 / Math.PI > 90) Latitude = Latitude / 180 * Math.PI;
-                if (Longitude * 180 / Math.PI > 90) Longitude = Longitude / 180 * Math.PI;
+			        {   
                 //parameters of CS for simplifying:
                 double φ_0 = CS_Params["Latitude of natural origin"];
                 double λ_0 = CS_Params["Longitude of natural origin"];
@@ -111,7 +108,7 @@ namespace MapConnection
                 double Easting = FE + k0 * B * η;
                 double Northing = FN + k0 * (B * ξ - M0);
 
-                return new Dictionary<string, object>
+                return new Dictionary<string, double>
                 {
                     {"Coord X", Easting},
                     {"Coord Y", Northing},
@@ -126,7 +123,7 @@ namespace MapConnection
             /// <param name="CoordY">Координата Y, метры (Север/North)</param>
             /// <returns></returns>
             [MultiReturn(new[] { "Longitude, radians", "Longitude, grades", "Latitude, radians", "Latitude, grades" })]
-            public static Dictionary<string, object> TM_FromRectangleToGeodetic(
+            public static Dictionary<string, double> TM_FromRectangleToGeodetic(
                 Dictionary<string, double> Ellipsoid,
                 Dictionary<string, double> CS_Params,
                 double CoordX, double CoordY)
@@ -209,7 +206,7 @@ namespace MapConnection
                 double φ1 = Math.Atan(Math.Sinh(Q11_4st));
                 double λ1 = λ_0 + Math.Asin(Math.Tanh(η0l) / Math.Cos(βl));
 
-                return new Dictionary<string, object>
+                return new Dictionary<string, double>
                 {
                     {"Longitude, radians", λ1},
                    {"Longitude, grades", λ1*180/Math.PI},
@@ -224,10 +221,10 @@ namespace MapConnection
     {
         private GeneralTerms() { }
 
-        [MultiReturn(new[] { "For SK-42 to WGS-84 EPSG:5044", "For SK-42 to WGS-84 and SK-63 EPSG:1267", "For SK-42 to WGS-84 EPSG:1254", "SK-95 to WGS-84 EPSG:5043",
-        "SK-95 to WGS-84 EPSG:1281", "SK-95 to WGS-84 EPSG:1281", "MGGT to WGS-84"})]
+        [MultiReturn(new[] { "For SK-42 to WGS-84 EPSG:5044", "For SK-42 to WGS-84 and SK-63 EPSG:1267", "For SK-42 to WGS-84 EPSG:1254", "For SK-95 to WGS-84 EPSG:5043",
+        "For SK-95 to WGS-84 EPSG:1281", "MGGT to WGS-84"})]
         public static Dictionary <string,string> DatumList_ToWGS84 ()
-		{
+		    {
             return new Dictionary<string, string>
                 {
                     {"For SK-42 to WGS-84 EPSG:5044", "23.57,-140.95,-79.8,0,-0.35,-0.79,-0.22"},
@@ -238,8 +235,8 @@ namespace MapConnection
                     {"For MGGT to WGS-84", "316.151,78.924,589.65,1.57273,-2.69209,-2.34693,8.4507"},
                 };
         }
-        [MultiReturn(new[] { "For SK-42 to PZ-90.11", "For SK-95 to PZ-90.11", "For PZ-90 to PZ-90.11", "WGS-84 to PZ-90.11",
-        "PZ-90.02 to PZ-90.11", "GSK-2011 to PZ-90.11", "SK-42 to GSK-2011", "SK-95 to GSK-2011",})]
+        [MultiReturn(new[] { "For SK-42 to PZ-90.11", "For SK-95 to PZ-90.11", "For PZ-90 to PZ-90.11", "For WGS-84 to PZ-90.11",
+        "For PZ-90.02 to PZ-90.11", "For GSK-2011 to PZ-90.11", "For SK-42 to GSK-2011", "For SK-95 to GSK-2011",})]
         public static Dictionary<string, string> DatumList_InternalRussia()
         {
             return new Dictionary<string, string>
@@ -270,11 +267,11 @@ namespace MapConnection
             return ReverseStr;
 
         }
-        public static Dictionary<string, object> GetDatumInfo(string InfoAboutDatum)
+        public static Dictionary<string, double> GetDatumInfo(string InfoAboutDatum)
         {
             //Example of datum's string: 23.57,-140.95,-79.8,0.00,-0.35,-0.79,-0.22
             string[] GetDatumParameters = InfoAboutDatum.Split(',');
-            return new Dictionary<string, object>
+            return new Dictionary<string, double>
                 {
                     {"X-Offset", Convert.ToDouble(GetDatumParameters[0])},
                     {"Y-Offset", Convert.ToDouble(GetDatumParameters[1])},
@@ -335,8 +332,8 @@ namespace MapConnection
             double Δa = FinishEllipsoid["Axis a"] - SourceEllipsoid["Axis a"];
             double Δe2 = FinishEllipsoid["Eccentricity2"] - SourceEllipsoid["Eccentricity2"];
             //Root variables (for simplify reading formulas)
-            double φ1 = Latitude * Math.PI / 180;
-            double λ1 = Longitude * Math.PI / 180;
+            double φ1 = Latitude;
+            double λ1 = Longitude;
 
             //Helpful parameters
             double M_ell = a * (1 - e2) * Math.Pow((1 - e2 * Math.Sin(φ1)), -1.5); // Радиус кривизны меридиана
