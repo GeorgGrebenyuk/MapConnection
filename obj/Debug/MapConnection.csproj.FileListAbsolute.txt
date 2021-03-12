@@ -27,3 +27,8 @@ C:\Work\Code\MapConnection\bin\Debug\DynamoUnits.dll
 C:\Work\Code\MapConnection\bin\Debug\ProtoGeometry.dll
 C:\Work\Code\MapConnection\obj\Debug\MapConnection.csproj.CopyComplete
 C:\Work\Code\MapConnection\obj\Debug\MapConnection.csprojAssemblyReference.cache
+E:\Work\Code\GitHub\MapConnection\bin\Debug\MapConnection.xml
+E:\Work\Code\GitHub\MapConnection\bin\Debug\DynamoServices.dll
+E:\Work\Code\GitHub\MapConnection\bin\Debug\DynamoUnits.dll
+E:\Work\Code\GitHub\MapConnection\bin\Debug\ProtoGeometry.dll
+E:\Work\Code\GitHub\MapConnection\obj\Debug\MapConnection.csproj.CopyComplete

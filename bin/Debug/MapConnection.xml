@@ -32,6 +32,33 @@
             <param name="str_format">If = true, WKT-code if split to strings; if false - it = one string</param>
             <returns>String with Full-WKT2 code or result</returns>
         </member>
+        <member name="M:MapConnection.CoordTransform.TM_FromGeodeticToRectangle(System.Collections.Generic.Dictionary{System.String,System.Double},System.Collections.Generic.Dictionary{System.String,System.Double},System.Double,System.Double)">
+            <summary>
+            Перевод геодезических координат на данном эллипсоиде в плоские прямоугольные
+            </summary>
+            <param name="Ellipsoid">Словарь с параметрами эллипсоида (из данной коллекции нодов)</param>
+            <param name="CS_Params">Словарь с параметрами систем координат (из данной коллекции нодов)</param>
+            <param name="Latitude">Широта в радианах (если подаете в градусах, она пересчитается автоматически)</param>
+            <param name="Longitude">Долгота в радианах (если подаете в градусах, она пересчитается автоматически)</param>
+            <returns></returns>
+        </member>
+        <member name="M:MapConnection.CoordTransform.TM_FromRectangleToGeodetic(System.Collections.Generic.Dictionary{System.String,System.Double},System.Collections.Generic.Dictionary{System.String,System.Double},System.Double,System.Double)">
+            <summary>
+            Перевод плоских прямоугольных координат в геодезические на данном эллипсоиде
+            </summary>
+            <param name="Ellipsoid">Словарь с параметрами эллипсоида (из данной коллекции нодов)</param>
+            <param name="CS_Params">Словарь с параметрами систем координат (из данной коллекции нодов)</param>
+            <param name="CoordX">Координата X, метры (Восток/Easting)</param>
+            <param name="CoordY">Координата Y, метры (Север/North)</param>
+            <returns></returns>
+        </member>
+        <member name="M:MapConnection.GeneralTerms.ReverseDatumParameters(System.String)">
+            <summary>
+            Возвращает обратный датум (при необходимости использовать таковой)
+            </summary>
+            <param name="CurrentDatumStr">Текущая строчная формулировка датума</param>
+            <returns></returns>
+        </member>
         <member name="M:MapConnection.MapCSLibrary.CS_Language_RUS">
             <summary>
             CS_Language_RUS return system values for creation LSP file, if program language is Russian

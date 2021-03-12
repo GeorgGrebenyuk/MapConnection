@@ -108,5 +108,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\WKT-RusMSK.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\CS_Parameters.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -327,11 +327,13 @@ namespace MapConnection
                          $"{NL}PARAMETER[{K}Scale factor at natural origin{K},{CS_Scale},{NL}SCALEUNIT[{K}unity{K},1],{NL}ID[{K}EPSG{K},8805]]," +
                          $"{NL}PARAMETER[{K}False easting{K},{CS_FE},{NL}LENGTHUNIT[{K}metre{K},1],{NL}ID[{K}EPSG{K},8806]]," +
                          $"{NL}PARAMETER[{K}False northing{K},{CS_FN},{NL}LENGTHUNIT[{K}metre{K},1],{NL}ID[{K}EPSG{K},8807]]]," +
-                         $"{NL}CS[Cartesian,2],{NL}AXIS[{K}({AxisAbb1}){K},{Axis1_Direct},{NL}ORDER[{AxisOrder1}],{NL}LENGTHUNIT[{K}{AxisUnit}{K},1,{NL}ID[{K}EPSG{K},9001]]],{NL}AXIS[{K}({AxisAbb2}){K},{Axis2_Direct},{NL}ORDER[{AxisOrder2}],{NL}LENGTHUNIT[{K}{AxisUnit}{K},1,{NL}ID[{K}EPSG{ K},9001]]]," +
+                         $"{NL}CS[Cartesian,2],{NL}AXIS[{K}({AxisAbb1}){K},{Axis1_Direct},{NL}ORDER[{AxisOrder1}],{NL}LENGTHUNIT[{K}{AxisUnit}{K},1,{NL}ID[{K}EPSG{K},9001]]]," +
+                         $"{NL}AXIS[{K}({AxisAbb2}){K},{Axis2_Direct},{NL}ORDER[{AxisOrder2}],{NL}LENGTHUNIT[{K}{AxisUnit}{K},1,{NL}ID[{K}EPSG{ K},9001]]]," +
                          $"{NL}USAGE[BBOX[{CS_BoundaryBox_LatMin_Value},{CS_BoundaryBox_LongMin_Value},{CS_BoundaryBox_LatMax_Value},{CS_BoundaryBox_LongMax_Value}]]]]," +
                          $"{NL}TARGETCRS[{NL}GEOGCRS[{K}WGS 84{K},{NL}DATUM[{K}World Geodetic System 1984{K}," +
                          $"{NL}ELLIPSOID[{K}WGS 84{K},6378137,298.257223563,{NL}LENGTHUNIT[{K}metre{K},1]]],{NL}PRIMEM[{K}Greenwich{K},0,{NL}ANGLEUNIT[{K}degree{K},0.0174532925199433]]," +
-                         $"{NL}CS[ellipsoidal,2],{NL}AXIS[{K}geodetic latitude(Lat){K},north,{NL}ORDER[1],{NL}ANGLEUNIT[{K}degree{K},0.0174532925199433]],{NL}AXIS[{K}geodetic longitude(Lon){K},east,{NL}ORDER[2],{NL}ANGLEUNIT[{K}degree{K},0.0174532925199433]],{NL}ID[{K}EPSG{K},4326]]]," +
+                         $"{NL}CS[ellipsoidal,2],{NL}AXIS[{K}geodetic latitude(Lat){K},north,{NL}ORDER[1],{NL}ANGLEUNIT[{K}degree{K},0.0174532925199433]],{NL}AXIS[{K}geodetic longitude(Lon){K},east," +
+                         $"{NL}ORDER[2],{NL}ANGLEUNIT[{K}degree{K},0.0174532925199433]],{NL}ID[{K}EPSG{K},4326]]]," +
                          $"{NL}ABRIDGEDTRANSFORMATION[{K}{Datum_descr_Name}{K},{NL}METHOD[{K}Coordinate Frame rotation{K},{NL}ID[{K}EPSG{K},9607]]," +
                          $"{NL}PARAMETER[{K}X-axis translation{K},{a1},{NL}ID[{K}EPSG{K},8605]]," +
                          $"{NL}PARAMETER[{K}Y-axis translation{K},{a2},{NL}ID[{K}EPSG{K},8606]]," +
@@ -380,6 +382,84 @@ namespace MapConnection
                     export_file.WriteLine(Full_WKT2 + Environment.NewLine);
                     export_file.Close();
                     export_file.Dispose();
+                }
+
+            }
+
+
+        }
+        public static void CreateCSList(string XML_MapCSLibrary_path, string Folder_Path, string TXT_CS_List_path, bool str_format = false)
+        {
+
+            string[] CS_List = File.ReadAllLines(TXT_CS_List_path);
+            var guid = Guid.NewGuid();
+            string WKT_WritePath = $@"{Folder_Path}\{guid}CS_Parameters_List.txt";
+
+            XmlDocument CS_Lib = new XmlDocument();
+            CS_Lib.Load(XML_MapCSLibrary_path);
+
+            XDocument CS_Lib2 = XDocument.Load(XML_MapCSLibrary_path);
+            XNamespace xmlns = "http://www.osgeo.org/mapguide/coordinatesystem";
+
+
+            XmlElement xRoot = CS_Lib.DocumentElement;
+            XmlNamespaceManager XmlNamespace = new XmlNamespaceManager(CS_Lib.NameTable);
+            XmlNamespace.AddNamespace("Dictionary", xRoot.OwnerDocument.DocumentElement.NamespaceURI);
+
+
+            //Обращаемся к словарю с системами координат (текстовой файл)
+            for (int i1 = 0; i1 < CS_List.Length; i1++)
+            {
+                string CS_name = CS_List[i1];
+                //Инициируем значения переменных
+                //Параметры СК текстовые
+                string CS_Descr_Name = null;
+                string CS_Type_Name = null;
+                string CS_Datum_Name = null;
+                //Параметры СК численные
+                List<string> proj_var = new List<string>();
+                double CS_LongLONO = 0d;
+                double CS_LatOFO = 0d;
+                double CS_Scale = 0d;
+                double CS_FE = 0d;
+                double CS_FN = 0d;
+
+                //Смотрим на библиотеку XML и делаем выборку с проективными СК
+                var query_child_CS = CS_Lib2.Descendants().Where(m1 => m1.Name.LocalName == "ProjectedCoordinateSystem");
+                foreach (var q1 in query_child_CS)
+                {
+                    //Отбираем блок определения СК по нужному имени
+                    var child_CS_name = q1.Element(xmlns + "Name").Value;
+                    if (child_CS_name == CS_name)
+                    {   //Делаем серию выборок, начинаем с описания СК
+                        CS_Descr_Name = q1.Element(xmlns + "Description").Value.ToString();
+                        CS_Type_Name = q1.Element(xmlns + "Conversion").Element(xmlns + "Projection").Element(xmlns + "OperationMethodId").Value.ToString();
+                        foreach (var CS_Parameters in q1.Element(xmlns + "Conversion").Element(xmlns + "Projection").Elements(xmlns + "ParameterValue"))
+                        {
+                            proj_var.Add(CS_Parameters.Element(xmlns + "Value").Value.ToString());
+                        }
+                        if (CS_Type_Name == "Transverse Mercator")
+                        {
+                            CS_LongLONO = Convert.ToDouble(proj_var[0]); //Longitude of natural origin
+                            CS_LatOFO = Convert.ToDouble(proj_var[1]); //Latitude of false origin
+                            CS_Scale = Convert.ToDouble(proj_var[2]); //Scaling factor for coord differences
+                            CS_FE = Convert.ToDouble(proj_var[3]); //False easting
+                            CS_FN = Convert.ToDouble(proj_var[4]); //False northing
+                        }
+                        else if (CS_Type_Name == "Gauss Kruger")
+                        {
+                            CS_LongLONO = Convert.ToDouble(proj_var[0]); //Longitude of natural origin
+                            CS_LatOFO = Convert.ToDouble(proj_var[1]); //Latitude of false origin
+                            CS_Scale = 1.0; //Scaling factor for coord differences
+                            CS_FE = Convert.ToDouble(proj_var[2]); //False easting
+                            CS_FN = Convert.ToDouble(proj_var[3]); //False northing
+                        }
+                    }
+                }
+
+                using (StreamWriter export_file = new StreamWriter(WKT_WritePath, true, Encoding.ASCII))
+                {
+                    export_file.WriteLine(CS_name + ',' + CS_LatOFO + ',' + CS_LongLONO + ',' + CS_Scale + ',' + CS_FE + ',' + CS_FN + Environment.NewLine);
                 }
 
             }
