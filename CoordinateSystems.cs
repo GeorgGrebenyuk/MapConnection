@@ -24,11 +24,12 @@ namespace MapConnection
 {
 	public class CoordinateSystems
 	{
-		/// <summary>
-		/// Node GetCurrentCoordinateSystem return the name of current CS (assigned to drawing)
-		/// </summary>
-		/// <returns></returns>
-		public static string GetCurrentCoordinateSystem()
+    private CoordinateSystems() { }
+    /// <summary>
+    /// Node GetCurrentCoordinateSystem return the name of current CS (assigned to drawing)
+    /// </summary>
+    /// <returns></returns>
+    public static string GetCurrentCoordinateSystem()
 		{
 			Autodesk.Gis.Map.Platform.AcMapMap map = Autodesk.Gis.Map.Platform.AcMapMap.GetCurrentMap();
 			string wkt = map.GetMapSRS();

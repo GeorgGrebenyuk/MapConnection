@@ -34,26 +34,27 @@ namespace MapConnection
             /// <param name="Latitude">Широта в радианах (если подаете в градусах, она пересчитается автоматически)</param>
             /// <param name="Longitude">Долгота в радианах (если подаете в градусах, она пересчитается автоматически)</param>
             /// <returns></returns>
-            [MultiReturn(new[] { "Coord X", "Coord Y" })]
+            [MultiReturn(new[] { "Coord X, meters", "Coord Y, meters" })]
             public static Dictionary<string, double> TM_FromGeodeticToRectangle (
                 Dictionary <string,double> Ellipsoid, 
                 Dictionary<string, double> CS_Params, 
                 double Latitude, double Longitude)
-			        {   
-                //parameters of CS for simplifying:
-                double φ_0 = CS_Params["Latitude of natural origin"];
-                double λ_0 = CS_Params["Longitude of natural origin"];
-                double k0 = CS_Params["Scale factor at natural origin"];
-                double FE = CS_Params["False easting"];
-                double FN = CS_Params["False northing"];
+			        {
+      //parameters of CS for simplifying:
+      double φ_0 = CS_Params["Latitude of natural origin"];
+      double λ_0 = CS_Params["Longitude of natural origin"];
+      double k0 = CS_Params["Scale factor at natural origin"];
+      double FE = CS_Params["False easting"];
+      double FN = CS_Params["False northing"];
+      double e1 = Math.Pow(Ellipsoid["Eccentricity2"], 0.5);
 
-                double φ = Latitude;
+      double φ = Latitude;
                 double λ = Longitude;
 
-                //Вспомогательные величины для расчета
-                double n = Ellipsoid["Reverse flattening"] / (2d - Ellipsoid["Reverse flattening"]);
-                //Для упрощения записи далее
-                double n2 = Math.Pow(n, 2);
+      //Вспомогательные величины для расчета
+      double n = Ellipsoid["Reverse flattening"] / (2d - Ellipsoid["Reverse flattening"]);
+      //Для упрощения записи далее
+      double n2 = Math.Pow(n, 2);
                 double n3 = Math.Pow(n, 3);
                 double n4 = Math.Pow(n, 4);
                 double n5 = Math.Pow(n, 5);
@@ -65,7 +66,7 @@ namespace MapConnection
                 double h3 = 61d / 240 * n3 - 103d / 140 * n4;
                 double h4 = 49561d / 161280 * n4;
                 //Прямой пересчет из градусов в прямоугольные
-                double M0 = 0d;
+                double M0;
                 if (φ_0 == 0)
                 { M0 = 0; }
                 else if (φ_0 == Math.PI / 2)
@@ -74,8 +75,8 @@ namespace MapConnection
                 { M0 = -B * Math.PI / 2; }
                 else
                 {
-                    double Q0 = Math.Log(Math.Tan(φ_0) + Math.Pow((Math.Pow(Math.Tan(φ_0), 2) + 1), 0.5)) - Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1 + Ellipsoid["Eccentricity2"] * Math.Sin(φ_0)) / (1 - Ellipsoid["Eccentricity2"] * Math.Sin(φ_0)));
-                    double β0 = Math.Atan(Math.Sinh(Q0));
+        double Q0 = Math_asinh(Math.Tan(φ_0)) - e1 * Math_atanh(e1 * Math.Sin(φ_0));
+        double β0 = Math.Atan(Math.Sinh(Q0));
                     double ξ00 = Math.Asin(Math.Sin(β0));
 
                     double ξ10 = h1 * Math.Sin(2 * ξ00);
@@ -86,8 +87,8 @@ namespace MapConnection
                     M0 = B * ξO;
 
                 }
-                double Q = Math.Log(Math.Tan(φ) + Math.Pow((Math.Pow(Math.Tan(φ), 2) + 1), 0.5)) - Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1 + Ellipsoid["Eccentricity2"] * Math.Sin(φ)) / (1 - Ellipsoid["Eccentricity2"] * Math.Sin(φ)));
-                double β = Math.Atan(Math.Sinh(Q));
+                double Q = Math_asinh(Math.Tan(φ)) - e1 * Math_atanh(e1 * Math.Sin(φ));
+      double β = Math.Atan(Math.Sinh(Q));
 
                 double η0 = 0.5 * Math.Log((1 + Math.Cos(β) * Math.Sin(λ - λ_0)) / (1 - Math.Cos(β) * Math.Sin(λ - λ_0)));
                 double ξ0 = Math.Asin(Math.Sin(β) * Math.Cosh(η0));
@@ -110,8 +111,8 @@ namespace MapConnection
 
                 return new Dictionary<string, double>
                 {
-                    {"Coord X", Easting},
-                    {"Coord Y", Northing},
+                    {"Coord X, meters", Easting},
+                    {"Coord Y, meters", Northing},
                 };
             }
             /// <summary>
@@ -123,97 +124,131 @@ namespace MapConnection
             /// <param name="CoordY">Координата Y, метры (Север/North)</param>
             /// <returns></returns>
             [MultiReturn(new[] { "Longitude, radians", "Longitude, grades", "Latitude, radians", "Latitude, grades" })]
-            public static Dictionary<string, double> TM_FromRectangleToGeodetic(
+    public static Dictionary<string, double> TM_FromRectangleToGeodetic(
                 Dictionary<string, double> Ellipsoid,
                 Dictionary<string, double> CS_Params,
                 double CoordX, double CoordY)
-            {
-                //parameters of CS for simplifying:
-                double φ_0 = CS_Params["Latitude of natural origin"];
-                double λ_0 = CS_Params["Longitude of natural origin"];
-                double k0 = CS_Params["Scale factor at natural origin"];
-                double FE = CS_Params["False easting"];
-                double FN = CS_Params["False northing"];
+    {
+      //parameters of CS for simplifying:
+      double φ_0 = CS_Params["Latitude of natural origin"];
+      double λ_0 = CS_Params["Longitude of natural origin"];
+      double k0 = CS_Params["Scale factor at natural origin"];
+      double FE = CS_Params["False easting"];
+      double FN = CS_Params["False northing"];
+      double e1 = Math.Pow(Ellipsoid["Eccentricity2"], 0.5);
+      double E = CoordX;
+      double N = CoordY;
 
-                double E = CoordX;
-                double N = CoordY;
-
-                //Вспомогательные величины для расчета
-                double n = Ellipsoid["Reverse flattening"] / (2d - Ellipsoid["Reverse flattening"]);
-                //Для упрощения записи далее
-                double n2 = Math.Pow(n, 2);
-                double n3 = Math.Pow(n, 3);
-                double n4 = Math.Pow(n, 4);
-                double n5 = Math.Pow(n, 5);
-                double n6 = Math.Pow(n, 6);
-                double B = Ellipsoid["Axis a"] / (1 + n) * (1 + n2 / 4 + n4 / 64);
-
-                double h1 = n * 0.5 - 2d / 3 * n2 + 5d / 16 * n3 + 41d / 180 * n4;
-                double h2 = 13d / 48 * n2 - 3d / 5 * n3 + 557d / 1440 * n4;
-                double h3 = 61d / 240 * n3 - 103d / 140 * n4;
-                double h4 = 49561d / 161280 * n4;
-                //Прямой пересчет из градусов в прямоугольные
-                double M0 = 0d;
-                if (φ_0 == 0)
-                { M0 = 0; }
-                else if (φ_0 == Math.PI / 2)
-                { M0 = B * Math.PI / 2; }
-                else if (φ_0 == -Math.PI / 2)
-                { M0 = -B * Math.PI / 2; }
-                else
-                {
-                    double Q0 = Math.Log(Math.Tan(φ_0) + Math.Pow((Math.Pow(Math.Tan(φ_0), 2) + 1), 0.5)) - Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1 + Ellipsoid["Eccentricity2"] * Math.Sin(φ_0)) / (1 - Ellipsoid["Eccentricity2"] * Math.Sin(φ_0)));
-                    double β0 = Math.Atan(Math.Sinh(Q0));
-                    double ξ00 = Math.Asin(Math.Sin(β0));
-
-                    double ξ10 = h1 * Math.Sin(2 * ξ00);
-                    double ξ20 = h2 * Math.Sin(4 * ξ00);
-                    double ξ30 = h3 * Math.Sin(6 * ξ00);
-                    double ξ40 = h4 * Math.Sin(8 * ξ00);
-                    double ξO = ξ00 + ξ10 + ξ20 + ξ30 + ξ40;
-                    M0 = B * ξO;
-
-                }
-                //Обратный пересчет
-                double h1l = n / 2d - 2d / 3 * n2 + 37d / 96 * n3 - 1d / 360 * n4;
-                double h2l = 1d / 48 * n2 + 1d / 15 * n3 - 437d / 1440 * n4;
-                double h3l = 17d / 480 * n3 - 37d / 840 * n4;
-                double h4l = 4397d / 161280 * n4;
-                double ηl = (E - FE) / (B * k0);
-                double ξl = ((N - FN) + k0 * M0) / (B * k0);
-
-                double ξ1l = h1l * Math.Sin(2 * ξl) * Math.Cosh(2 * ηl);
-                double ξ2l = h2l * Math.Sin(4 * ξl) * Math.Cosh(4 * ηl);
-                double ξ3l = h3l * Math.Sin(6 * ξl) * Math.Cosh(6 * ηl);
-                double ξ4l = h4l * Math.Sin(8 * ξl) * Math.Cosh(8 * ηl);
-                double ξ0l = ξl - (ξ1l + ξ2l + ξ3l + ξ4l);
-
-                double η1l = h1l * Math.Cos(2 * ξl) * Math.Sinh(2 * ηl);
-                double η2l = h2l * Math.Cos(4 * ξl) * Math.Sinh(4 * ηl);
-                double η3l = h3l * Math.Cos(6 * ξl) * Math.Sinh(6 * ηl);
-                double η4l = h4l * Math.Cos(8 * ξl) * Math.Sinh(8 * ηl);
-                double η0l = ηl - (η1l + η2l + η3l + η4l);
+      //Вспомогательные величины для расчета
+      double n = Ellipsoid["Reverse flattening"] / (2d - Ellipsoid["Reverse flattening"]);
+      //Для упрощения записи далее
+      double n2 = Math.Pow(n, 2);
+      double n3 = Math.Pow(n, 3);
+      double n4 = Math.Pow(n, 4);
+      double n5 = Math.Pow(n, 5);
+      double n6 = Math.Pow(n, 6);
+      double B = Ellipsoid["Axis a"] / (1 + n) * (1 + n2 / 4 + n4 / 64);
 
 
-                double βl = Math.Asin(Math.Sin(ξ0l) / Math.Cosh(η0l));
-                double Q1 = Math.Log(Math.Tan(βl) + Math.Pow((Math.Pow(Math.Tan(βl), 2) + 1), 0.5));
-                Console.WriteLine($"{βl} {Q1}");
-                double Q11_1st = Q1 + Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1d + Ellipsoid["Eccentricity2"] * Math.Tanh(Q1)) / (1 - Ellipsoid["Eccentricity2"] * Math.Tanh(Q1)));
-                double Q11_2st = Q1 + Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1d + Ellipsoid["Eccentricity2"] * Math.Tanh(Q11_1st)) / (1 - Ellipsoid["Eccentricity2"] * Math.Tanh(Q11_1st)));
-                double Q11_3st = Q1 + Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1d + Ellipsoid["Eccentricity2"] * Math.Tanh(Q11_2st)) / (1 - Ellipsoid["Eccentricity2"] * Math.Tanh(Q11_2st)));
-                double Q11_4st = Q1 + Ellipsoid["Eccentricity2"] * 0.5 * Math.Log((1d + Ellipsoid["Eccentricity2"] * Math.Tanh(Q11_3st)) / (1 - Ellipsoid["Eccentricity2"] * Math.Tanh(Q11_3st)));
-                //Итоговые результаты
-                double φ1 = Math.Atan(Math.Sinh(Q11_4st));
-                double λ1 = λ_0 + Math.Asin(Math.Tanh(η0l) / Math.Cos(βl));
+      double h1 = n * 0.5 - 2d / 3 * n2 + 5d / 16 * n3 + 41d / 180 * n4;
+      double h2 = 13d / 48 * n2 - 3d / 5 * n3 + 557d / 1440 * n4;
+      double h3 = 61d / 240 * n3 - 103d / 140 * n4;
+      double h4 = 49561d / 161280 * n4;
+      //Прямой пересчет из градусов в прямоугольные
+      double M0;
+      if (φ_0 == 0)
+      { M0 = 0; }
+      else if (φ_0 == Math.PI / 2)
+      { M0 = B * Math.PI / 2; }
+      else if (φ_0 == -Math.PI / 2)
+      { M0 = -B * Math.PI / 2; }
+      else
+      {
 
-                return new Dictionary<string, double>
+        double Q0 = Math_asinh(Math.Tan(φ_0)) - e1 * Math_atanh(e1 * Math.Sin(φ_0));
+        double β0 = Math.Atan(Math.Sinh(Q0));
+        double ξ00 = Math.Asin(Math.Sin(β0));
+
+        double ξ10 = h1 * Math.Sin(2 * ξ00);
+        double ξ20 = h2 * Math.Sin(4 * ξ00);
+        double ξ30 = h3 * Math.Sin(6 * ξ00);
+        double ξ40 = h4 * Math.Sin(8 * ξ00);
+        double ξO = ξ00 + ξ10 + ξ20 + ξ30 + ξ40;
+
+        M0 = B * ξO;
+      }
+
+      //Обратный пересчет
+      double h1l = n / 2d - 2d / 3 * n2 + 37d / 96 * n3 - 1d / 360 * n4;
+      double h2l = 1d / 48 * n2 + 1d / 15 * n3 - 437d / 1440 * n4;
+      double h3l = 17d / 480 * n3 - 37d / 840 * n4;
+      double h4l = 4397d / 161280 * n4;
+      double ηl = (E - FE) / (B * k0);
+      double ξl = ((N - FN) + k0 * M0) / (B * k0);
+
+      double ξ1l = h1l * Math.Sin(2 * ξl) * Math.Cosh(2 * ηl);
+      double ξ2l = h2l * Math.Sin(4 * ξl) * Math.Cosh(4 * ηl);
+      double ξ3l = h3l * Math.Sin(6 * ξl) * Math.Cosh(6 * ηl);
+      double ξ4l = h4l * Math.Sin(8 * ξl) * Math.Cosh(8 * ηl);
+      double ξ0l = ξl - (ξ1l + ξ2l + ξ3l + ξ4l);
+
+      double η1l = h1l * Math.Cos(2 * ξl) * Math.Sinh(2 * ηl);
+      double η2l = h2l * Math.Cos(4 * ξl) * Math.Sinh(4 * ηl);
+      double η3l = h3l * Math.Cos(6 * ξl) * Math.Sinh(6 * ηl);
+      double η4l = h4l * Math.Cos(8 * ξl) * Math.Sinh(8 * ηl);
+      double η0l = ηl - (η1l + η2l + η3l + η4l);
+
+      double βl = Math.Asin(Math.Sin(ξ0l) / Math.Cosh(η0l));
+      double Q1 = Math_asinh(Math.Tan(βl));
+
+      double Q11_1st = Q1 + e1 * Math_atanh(e1 * Math.Tanh(Q1));
+      double Q11_2st = Q1 + e1 * Math_atanh(e1 * Math.Tanh(Q11_1st));
+      double Q11_3st = Q1 + e1 * Math_atanh(e1 * Math.Tanh(Q11_2st));
+      double Q11_4st = Q1 + e1 * Math_atanh(e1 * Math.Tanh(Q11_3st));
+
+      //Итоговые результаты
+      double φ1 = Math.Atan(Math.Sinh(Q11_4st));
+      double λ1 = λ_0 + Math.Asin(Math.Tanh(η0l) / Math.Cos(βl));
+
+      return new Dictionary<string, double>
                 {
                     {"Longitude, radians", λ1},
                    {"Longitude, grades", λ1*180/Math.PI},
                    {"Latitude, radians", φ1},
                    {"Latitude, grades", φ1*180/Math.PI},
                 };
-            }
+    }
+    public static double StringToDouble(string str) { return Convert.ToDouble(str); }
+    public static double GradesToRadians(double grades) { return grades/180*Math.PI; }
+    public static double RadiansToGrades(double radians) { return radians*180/Math.PI; }
+    public static string StrFormatOfGraduses (double grades)
+		{
+      double Int_grad = Math.Floor(grades);
+      double Int_min = Math.Floor((grades - Int_grad) * 60);
+      string Str_min = Convert.ToString(Int_min);
+      if (Int_min < 10) Str_min = 0 + Convert.ToString(Int_min);
+
+      double Float_sec = Math.Round(((grades - Int_grad) * 60 - Int_min) * 60, 2);
+      return Convert.ToString(Int_grad) + "°" + Str_min + "'" + Convert.ToString(Float_sec);
+
+    }
+    private static double Math_asinh(double x)
+    {
+      return Math.Log(x + Math.Pow(Math.Pow(x, 2) + 1, 0.5));
+    }
+    private static double Math_acosh(double x)
+    {
+      return Math.Log(x + Math.Pow(Math.Pow(x, 2) - 1, 0.5));
+    }
+    private static double Math_atanh(double x)
+    {
+      return 0.5 * Math.Log((1 + x) / (1 - x));
+    }
+    private static double Math_acoth(double x)
+    {
+      return 0.5 * Math.Log((x + 1) / (x - 1));
+    }
+
 
   }
 
@@ -257,11 +292,11 @@ namespace MapConnection
         /// <param name="CurrentDatumStr">Текущая строчная формулировка датума</param>
         /// <returns></returns>
         public static string ReverseDatumParameters (string CurrentDatumStr)
-		{
+		    { 
             string ReverseStr = null;
             foreach (string str in CurrentDatumStr.Split(','))
-			{
-                ReverseStr = ReverseStr + "-" + str + ',';
+			      {
+                ReverseStr = ReverseStr + (Convert.ToDouble(str) * (-1)).ToString() + ',';
 
             }
             return ReverseStr;
@@ -276,17 +311,31 @@ namespace MapConnection
                     {"X-Offset", Convert.ToDouble(GetDatumParameters[0])},
                     {"Y-Offset", Convert.ToDouble(GetDatumParameters[1])},
                     {"Z-Offset", Convert.ToDouble(GetDatumParameters[2])},
-                    {"Rotation angle x, rad", Convert.ToDouble(GetDatumParameters[3])/180*Math.PI},
-                    {"Rotation angle y, rad", Convert.ToDouble(GetDatumParameters[4])/180*Math.PI},
-                    {"Rotation angle z, rad", Convert.ToDouble(GetDatumParameters[5])/180*Math.PI},
+                    {"Rotation angle x, rad", Convert.ToDouble(GetDatumParameters[3])/180/3600*Math.PI},
+                    {"Rotation angle y, rad", Convert.ToDouble(GetDatumParameters[4])/180/3600*Math.PI},
+                    {"Rotation angle z, rad", Convert.ToDouble(GetDatumParameters[5])/180/3600*Math.PI},
                     {"Scale factor", Convert.ToDouble(GetDatumParameters[6])*Math.Pow (10,-6)},
                 };
         }
-        public static Dictionary<string, double> EllipsoidParameters(string EllipsoidName)
+    public static Dictionary<string, double> Custom_EllipsoidParameters(string Axis_a_meters, string Flattening)
+    {
+      double a = Convert.ToDouble(Axis_a_meters); //Main axis, meters
+      double flattening = 1/Convert.ToDouble(Flattening); //Reverse flatenning = 1/...
+
+      double e2 = flattening * (2 - flattening); //Eccentricity in square
+
+      return new Dictionary<string, double>
+                {
+                    {"Axis a", a},
+                    {"Reverse flattening", flattening},
+                    {"Eccentricity2", e2},
+                };
+    }
+    public static Dictionary<string, double> EllipsoidParameters(string EllipsoidName)
         {
             double a = 0d; //Main axis, meters
             double flattening = 0d; //Reverse flatenning = 1/...
-            double e2 = flattening * (2 - flattening); //Eccentricity in square
+            
 
             switch (EllipsoidName)
             {
@@ -310,9 +359,14 @@ namespace MapConnection
                     a = 6378137d;
                     flattening = 1 / 298.257223563;
                     break;
-            }
+        case "Bessel 1841, EPSG:7004":
+          a = 6377397.155;
+          flattening = 1 / 299.1528128;
+          break;
+      }
+          double e2 = flattening * (2 - flattening); //Eccentricity in square
 
-            return new Dictionary<string, double>
+                 return new Dictionary<string, double>
                 {
                     {"Axis a", a},
                     {"Reverse flattening", flattening},
@@ -320,61 +374,64 @@ namespace MapConnection
                 };
         }
         [MultiReturn(new[] { "Latitude, radians", "Longitude, radians", "Latitude, grades", "Longitude, grades", "Height, meters" })]
-        public static Dictionary<string, double> Datum_Recalculation(
-            Dictionary<string, double> DatumInfo,
-            Dictionary<string, double> SourceEllipsoid,
-            Dictionary<string, double> FinishEllipsoid,
-            double Latitude, double Longitude, double Height)
-        {
-            //General parameters between two ellipsoids
-            double a = (SourceEllipsoid["Axis a"] + FinishEllipsoid["Axis a"]) / 2;
-            double e2 = (SourceEllipsoid["Eccentricity2"] + FinishEllipsoid["Eccentricity2"]) / 2;
-            double Δa = FinishEllipsoid["Axis a"] - SourceEllipsoid["Axis a"];
-            double Δe2 = FinishEllipsoid["Eccentricity2"] - SourceEllipsoid["Eccentricity2"];
-            //Root variables (for simplify reading formulas)
-            double φ1 = Latitude;
-            double λ1 = Longitude;
+    public static Dictionary<string, double> Datum_Recalculation(
+             Dictionary<string, double> DatumInfo,
+             Dictionary<string, double> SourceEllipsoid,
+             Dictionary<string, double> FinishEllipsoid,
+             double Latitude, double Longitude, double Height)
+    {
+      //General parameters between two ellipsoids
+      double a = (SourceEllipsoid["Axis a"] + FinishEllipsoid["Axis a"]) / 2;
+      double e2 = (SourceEllipsoid["Eccentricity2"] + FinishEllipsoid["Eccentricity2"]) / 2;
+      double Δa = FinishEllipsoid["Axis a"] - SourceEllipsoid["Axis a"];
+      double Δe2 = FinishEllipsoid["Eccentricity2"] - SourceEllipsoid["Eccentricity2"];
+      //double e1 = Math.Pow(SourceEllipsoid["Eccentricity2"], 0.5);
 
-            //Helpful parameters
-            double M_ell = a * (1 - e2) * Math.Pow((1 - e2 * Math.Sin(φ1)), -1.5); // Радиус кривизны меридиана
-            double N_ell = a * Math.Pow((1 - e2 * Math.Sin(φ1)), -0.5); // Радиус кривизны первого вертикала
-                                                                        //Datum parameters
-            double ΔX = DatumInfo["X-Offset"];
-            double ΔY = DatumInfo["Y-Offset"];
-            double ΔZ = DatumInfo["Z-Offset"];
-            double ω_x_rad = DatumInfo["Rotation angle x, rad"];
-            double ω_y_rad = DatumInfo["Rotation angle y, rad"];
-            double ω_z_rad = DatumInfo["Rotation angle z, rad"];
-            double m = DatumInfo["Scale factor"];
+      //Root variables (for simplify reading formulas)
+      double φ1 = Latitude;
+      double λ1 = Longitude;
 
-            //1.5.1 Вычисление величины поправок к координатам
-            double dB = 1 / (M_ell + Height) * (N_ell / a * e2 * Δe2 * Math.Sin(φ1) * Math.Cos(φ1) + (Math.Pow(N_ell, 2) / Math.Pow(a, 2) + 1) * N_ell * Math.Sin(φ1) * Math.Cos(φ1) * Δe2 / 2 - (ΔX * Math.Cos(λ1) + ΔY * Math.Sin(λ1)) * Math.Sin(φ1) + ΔZ * Math.Cos(φ1)) - ω_x_rad * Math.Sin(λ1) * (1 + e2 * Math.Cos(2 * φ1)) + ω_y_rad * Math.Cos(λ1) * (1 + e2 * Math.Cos(2 * φ1)) - m * e2 * Math.Sin(φ1) * Math.Cos(φ1);
-            double dL = 1 / ((N_ell + Height) * Math.Cos(φ1)) * (-ΔX * Math.Sin(λ1) + ΔY * Math.Cos(λ1)) + Math.Tan(φ1) * (1 - e2) * (ω_x_rad * Math.Cos(λ1) + ω_y_rad * Math.Sin(λ1)) - ω_z_rad;
-            double dH = -a / N_ell * Δa + N_ell * Δe2 / 2 * Math.Pow(Math.Sin(φ1), 2) + (ΔX * Math.Cos(λ1) + ΔY * Math.Sin(λ1)) * Math.Cos(φ1) + ΔZ * Math.Sin(φ1) - N_ell * e2 * Math.Sin(φ1) * Math.Cos(φ1) * (ω_x_rad * Math.Sin(λ1) - ω_y_rad * Math.Cos(λ1)) + (Math.Pow(a, 2) / N_ell + Height);
-            //1.5.2 Вычисление геодезических координат в целевой системе (предварительно)
-            double φ11 = (2 * φ1 + dB) / 2;
-            double λ11 = (2 * λ1 + dL) / 2;
-            double H11 = (2 * Height + dH) / 2;
-            //1.5.3 Уточнение параметров
-            double dB1 = 1 / (M_ell + Height) * (N_ell / a * e2 * Δe2 * Math.Sin(φ11) * Math.Cos(φ11) + (Math.Pow(N_ell, 2) / Math.Pow(a, 2) + 1) * N_ell * Math.Sin(φ11) * Math.Cos(φ11) * Δe2 / 2 - (ΔX * Math.Cos(λ11) + ΔY * Math.Sin(λ11)) * Math.Sin(φ11) + ΔZ * Math.Cos(φ11)) - ω_x_rad * Math.Sin(λ11) * (1 + e2 * Math.Cos(2 * φ11)) + ω_y_rad * Math.Cos(λ11) * (1 + e2 * Math.Cos(2 * φ11)) - m * e2 * Math.Sin(φ11) * Math.Cos(φ11);
-            double dL1 = 1 / ((N_ell + Height) * Math.Cos(φ11)) * (-ΔX * Math.Sin(λ11) + ΔY * Math.Cos(λ11)) + Math.Tan(φ11) * (1 - e2) * (ω_x_rad * Math.Cos(λ11) + ω_y_rad * Math.Sin(λ11)) - ω_z_rad;
-            double dH1 = -a / N_ell * Δa + N_ell * Δe2 / 2 * Math.Pow(Math.Sin(φ11), 2) + (ΔX * Math.Cos(λ11) + ΔY * Math.Sin(λ11)) * Math.Cos(φ11) + ΔZ * Math.Sin(φ11) - N_ell * e2 * Math.Sin(φ11) * Math.Cos(φ11) * (ω_x_rad * Math.Sin(λ11) - ω_y_rad * Math.Cos(λ11)) + (Math.Pow(a, 2) / N_ell + Height);
-            //1.6 Вычисление геодезических координат в целевой системе
-            double φ2 = (φ1 + dB1);
-            double λ2 = (λ1 + dL1);
-            double Height2 = (Height + dH1);
+      //Helpful parameters
+      double M_ell = a * (1 - e2) * Math.Pow(1 - e2 * Math.Pow(Math.Sin(φ1), 2), -1.5); // Радиус кривизны меридиана
+      double N_ell = a * Math.Pow(1 - e2 * Math.Pow(Math.Sin(φ1), 2), -0.5); // Радиус кривизны первого вертикала
 
-            return new Dictionary<string, double>
+      //Datum parameters
+      double ΔX = DatumInfo["X-Offset"];
+      double ΔY = DatumInfo["Y-Offset"];
+      double ΔZ = DatumInfo["Z-Offset"];
+      double ω_x_rad = DatumInfo["Rotation angle x, rad"];
+      double ω_y_rad = DatumInfo["Rotation angle y, rad"];
+      double ω_z_rad = DatumInfo["Rotation angle z, rad"];
+      double m = DatumInfo["Scale factor"];
+      //1.5.1 Вычисление величины поправок к координатам
+      double dB = 1 / (M_ell + Height) * (N_ell / a * e2 * Δa * Math.Sin(φ1) * Math.Cos(φ1) + (Math.Pow(N_ell, 2) / Math.Pow(a, 2) + 1) * N_ell * Math.Sin(φ1) * Math.Cos(φ1) * Δe2 / 2 - (ΔX * Math.Cos(λ1) + ΔY * Math.Sin(λ1)) * Math.Sin(φ1) + ΔZ * Math.Cos(φ1)) - ω_x_rad * Math.Sin(λ1) * (1 + e2 * Math.Cos(2 * φ1)) + ω_y_rad * Math.Cos(λ1) * (1 + e2 * Math.Cos(2 * φ1)) - m * e2 * Math.Sin(φ1) * Math.Cos(φ1);
+      double dL = 1 / ((N_ell + Height) * Math.Cos(φ1)) * (-ΔX * Math.Sin(λ1) + ΔY * Math.Cos(λ1)) + Math.Tan(φ1) * (1 - e2) * (ω_x_rad * Math.Cos(λ1) + ω_y_rad * Math.Sin(λ1)) - ω_z_rad;
+      double dH = -a / N_ell * Δa + N_ell * Δe2 / 2 * Math.Pow(Math.Sin(φ1), 2) + (ΔX * Math.Cos(λ1) + ΔY * Math.Sin(λ1)) * Math.Cos(φ1) + ΔZ * Math.Sin(φ1) - N_ell * e2 * Math.Sin(φ1) * Math.Cos(φ1) * (ω_x_rad * Math.Sin(λ1) - ω_y_rad * Math.Cos(λ1)) + (Math.Pow(a, 2) / N_ell + Height) * m;
+      //1.5.2 Вычисление геодезических координат в целевой системе (предварительно)
+      double φ11 = (2 * φ1 + dB) / 2;
+      double λ11 = (2 * λ1 + dL) / 2;
+      double H11 = (2 * Height + dH) / 2;
+
+      //1.5.3 Уточнение параметров
+      double dB1 = 1 / (M_ell + Height) * (N_ell / a * e2 * Δa * Math.Sin(φ11) * Math.Cos(φ11) + (Math.Pow(N_ell, 2) / Math.Pow(a, 2) + 1) * N_ell * Math.Sin(φ11) * Math.Cos(φ11) * Δe2 / 2 - (ΔX * Math.Cos(λ11) + ΔY * Math.Sin(λ11)) * Math.Sin(φ11) + ΔZ * Math.Cos(φ11)) - ω_x_rad * Math.Sin(λ11) * (1 + e2 * Math.Cos(2 * φ11)) + ω_y_rad * Math.Cos(λ11) * (1 + e2 * Math.Cos(2 * φ11)) - m * e2 * Math.Sin(φ11) * Math.Cos(φ11);
+      double dL1 = 1 / ((N_ell + Height) * Math.Cos(φ11)) * (-ΔX * Math.Sin(λ11) + ΔY * Math.Cos(λ11)) + Math.Tan(φ11) * (1 - e2) * (ω_x_rad * Math.Cos(λ11) + ω_y_rad * Math.Sin(λ11)) - ω_z_rad;
+      double dH1 = -a / N_ell * Δa + N_ell * Δe2 / 2 * Math.Pow(Math.Sin(φ11), 2) + (ΔX * Math.Cos(λ11) + ΔY * Math.Sin(λ11)) * Math.Cos(φ11) + ΔZ * Math.Sin(φ11) - N_ell * e2 * Math.Sin(φ11) * Math.Cos(φ11) * (ω_x_rad * Math.Sin(λ11) - ω_y_rad * Math.Cos(λ11)) + (Math.Pow(a, 2) / N_ell + H11) * m;
+      //1.6 Вычисление геодезических координат в целевой системе
+      double φ2 = (φ1 + dB1);
+      double λ2 = (λ1 + dL1);
+      double H2 = (Height + dH1);
+
+      return new Dictionary<string, double>
                 {
                     {"Latitude, radians", φ2},
                     {"Longitude, radians", λ2},
                     {"Latitude, grades", φ2*180/Math.PI},
                     {"Longitude, grades", λ2*180/Math.PI},
-                     {"Height, meters", Height2},
+                     {"Height, meters", H2},
                 };
-        }
+    }
 
-        public static Dictionary<string, double> GetCSParameters(string CS_Name)
+    public static Dictionary<string, double> GetCSParameters(string CS_Name)
         {
             //string DataStr;
             //string CS_Needing = null;
@@ -404,6 +461,7 @@ namespace MapConnection
                   {"False northing", Convert.ToDouble (InfoAboutCS[5])},
                 };
         }
+    
     }
 
 }

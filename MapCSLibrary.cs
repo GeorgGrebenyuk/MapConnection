@@ -21,7 +21,9 @@ using System.Xml.Linq;
 namespace MapConnection
 {
 	public class MapCSLibrary
+		
 	{
+		private MapCSLibrary() { }
 		/// <summary>
 		/// CS_Language_RUS return system values for creation LSP file, if program language is Russian
 		/// </summary>
@@ -94,7 +96,7 @@ namespace MapConnection
 			}
 			string space = " ";
 			sb.AppendLine(" " + $@"""{space}""" + " " + $@"""{CS_Agree}""" + " " + @"""""" + ")");
-			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.ASCII))
+			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
 			{
 				export_file.Write(sb.ToString());
 			}
@@ -131,7 +133,7 @@ namespace MapConnection
 			}
 			string space = " ";
 			sb.AppendLine(" " + $@"""{space}""" + " " + $@"""{CS_Agree}""" + " " + @"""""" + ")");
-			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.ASCII))
+			using (StreamWriter export_file = new StreamWriter(writePath, true, Encoding.UTF8))
 			{
 				export_file.Write(sb.ToString());
 			}
